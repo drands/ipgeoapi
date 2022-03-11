@@ -58,17 +58,6 @@ class Upload {
      * @param string $new_path The path to the new database file
      */
     private static function removeOldBackups($new_path) {
-        /*
-        $files = glob(self::$directory . DIRECTORY_SEPARATOR . self::$basename . '-*');
-        if (count($files) > 1) {
-            foreach ($files as $file) {
-                if ($file != $new_path) {
-                    unlink($file);
-                }
-            }
-        }
-        */
-
         $files = glob(self::$directory . DIRECTORY_SEPARATOR . '*.mmdb');
         $files = array_diff($files, [$new_path]);
         foreach ($files as $file) {
