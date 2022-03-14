@@ -7,6 +7,7 @@ use Slim\Factory\AppFactory;
 use App\GeoIPSearch;
 use App\Token;
 use App\Upload;
+use App\Util;
 
 require __DIR__ . '/../vendor/autoload.php';
 
@@ -32,6 +33,27 @@ $app->get('/ip', function (Request $request, Response $response, $args) {
     $ip = $params['ip'] ?? null;
 
     if (!$token || !$ip) {
+        $response->getBody()->write("Missing parameters");
+        return $response;
+    }
+    if (!Token::validate($token)) {
+        $response->getBody()->write("Invalid token");
+        return $response;
+    }
+
+    $geoIPSearch = new GeoIPSearch();
+    $record = $geoIPSearch->search($ip);
+    $json = $geoIPSearch->parse($record);
+    $response->getBody()->write($json);
+    return $response->withHeader('Content-Type', 'application/json');
+});
+
+$app->get('/me', function (Request $request, Response $response, $args) {
+    $params = $request->getQueryParams();
+    $token = $params['token'] ?? null;
+    $ip = Util::getIP();
+
+    if (!$token) {
         $response->getBody()->write("Missing parameters");
         return $response;
     }
